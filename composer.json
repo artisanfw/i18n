@@ -1,0 +1,22 @@
+{
+  "name": "artisanfw/i18n",
+  "description": "Easy-to-use internationalization for PHP",
+  "type": "library",
+  "authors": [
+    {
+      "name": "Airam Batista",
+      "email": "airamb@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=8.3",
+    "symfony/translation": "^7.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "Artisan\\": "src/"
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}
