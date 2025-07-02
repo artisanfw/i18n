@@ -85,6 +85,6 @@ class Language
 
     public function getLocale(): string
     {
-        return $this->translator->getLocale();
+        return $this->translator->getLocale() ?? $this->locale;
     }
 }

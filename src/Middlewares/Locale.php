@@ -10,28 +10,18 @@ class Locale implements IMiddleware
 {
     public function before(Request $request): void
     {
-        // 1. Primero intenta obtener el idioma desde el parámetro 'lang' en la URL
         $lang = $request->query->get('lang');
 
         if ($lang) {
-            // Si se encuentra el parámetro, usa ese idioma
-            Language::setLocale($lang);
+            Language::i()->setLocale($lang);
         } else {
-            // 2. Si no se encuentra 'lang', intenta obtenerlo desde el header 'Accept-Language'
             $header = $request->headers->get('Accept-Language');
-
             if ($header) {
                 $locale = $this->parseLocale($header);
                 if ($locale) {
-                    Language::setLocale($locale);
+                    Language::i()->setLocale($locale);
                 }
             }
-        }
-
-        // 3. Si no se encuentra ninguno, se usa el idioma por defecto configurado
-        if (!Language::i()->getLocale()) {
-            $defaultLocale = Language::i()->getDefaultLocale();
-            Language::setLocale($defaultLocale);
         }
     }
 
