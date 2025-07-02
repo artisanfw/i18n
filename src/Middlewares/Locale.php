@@ -4,11 +4,12 @@ namespace Artisan\Middlewares;
 
 use Artisan\Services\Language;
 use Symfony\Component\HttpFoundation\Request;
+use Artisan\Routing\Interfaces\IApiResponse;
 use Artisan\Routing\Interfaces\IMiddleware;
 
 class Locale implements IMiddleware
 {
-    public function before(Request $request): void
+    public function before(array $routeParams, Request $request, IApiResponse $response): void
     {
         $lang = $request->query->get('lang');
 
@@ -25,7 +26,7 @@ class Locale implements IMiddleware
         }
     }
 
-    public function after(Request $request, mixed $response): void { }
+    public function after(array $routeParams, Request $request, IApiResponse $response): void { }
 
     private function parseLocale(string $header): ?string
     {
