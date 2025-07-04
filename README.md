@@ -48,7 +48,7 @@ $twig->addFunction(Language::getTwigFunction());
 ```
 > **Note:** This requires `Twig` to be installed. If it's not installed, the function won't be available.
 
-If you're using `artisanfw/twig`, simply include `Language::getTwigFunction()` in the config under functions.
+If you're using `artisanfw/twig`, simply include `Language::getTwigFunction()` in the Twig config under functions.
 
 ## Translation in a Twig template:
 ```twig
