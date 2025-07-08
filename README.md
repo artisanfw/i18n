@@ -17,6 +17,9 @@ Language::load([
 ```
 Translation files must follow the pattern: `en.yaml`, `es.yaml`, etc.
 
+**Recommended:** ICU file pattern `en.intl.yaml`, etc. "intl" enables ICU message formatting with pluralization. But it uses `{single mustache}` instead `%percent%` variables
+
+
 Supported formats:
 * `Language::YAML_FORMAT`
 * `Language::JSON_FORMAT`
