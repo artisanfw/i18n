@@ -43,7 +43,7 @@ class Language
         };
 
         foreach (scandir($self->path) as $file) {
-            if (preg_match('/^([a-z]{2})\.' . $format . '$/i', $file, $matches)) {
+            if (preg_match('/^([a-z]{2}(?:[-_][A-Z]{2})?)\.([a-z]+)(?:\.yaml)?$/i', $file, $matches)) {
                 $lang = $matches[1];
                 $translator->addResource($format, "{$self->path}/$file", $lang);
             }
