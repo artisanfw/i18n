@@ -75,7 +75,20 @@ class Language
 
     public function trans(string $key, array $params = [], ?string $domain = null, ?string $locale = null): string
     {
-        return $this->translator->trans($key, $params, $domain, $locale);
+        $processedParams = [];
+
+        foreach ($params as $paramKey => $value) {
+            if (
+                (str_starts_with($paramKey, '{') && str_ends_with($paramKey, '}')) ||
+                (str_starts_with($paramKey, '%') && str_ends_with($paramKey, '%'))
+            ) {
+                $processedParams[$paramKey] = $value;
+            } else {
+                $processedParams['{' . $paramKey . '}'] = $value;
+            }
+        }
+
+        return $this->translator->trans($key, $processedParams, $domain, $locale);
     }
 
     public function setLocale(string $locale): void
