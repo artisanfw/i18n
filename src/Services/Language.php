@@ -27,6 +27,7 @@ class Language
         }
 
         $format = $config['file_format'] ?? self::YAML_FORMAT;
+
         if (!in_array($format, [self::YAML_FORMAT, self::JSON_FORMAT])) {
             throw new RuntimeException('Unsupported file format: ' . $format);
         }
@@ -36,16 +37,21 @@ class Language
         $self->path = rtrim($config['path'], '/');
 
         $translator = new Translator($self->locale);
-
-        match ($format) {
-            self::YAML_FORMAT => $translator->addLoader(self::YAML_FORMAT, new YamlFileLoader()),
-            self::JSON_FORMAT => $translator->addLoader(self::JSON_FORMAT, new JsonFileLoader()),
-        };
+        $translator->addLoader(self::YAML_FORMAT, new YamlFileLoader());
+        $translator->addLoader(self::JSON_FORMAT, new JsonFileLoader());
 
         foreach (scandir($self->path) as $file) {
-            if (preg_match('/^([a-z]{2}(?:[-_][A-Z]{2})?)\.([a-z]+)(?:\.yaml)?$/i', $file, $matches)) {
-                $lang = $matches[1];
-                $translator->addResource($format, "{$self->path}/$file", $lang);
+            // Support: es.yaml, es.intl.yaml, messages.es.yaml, messages.es.intl.yaml
+            if (preg_match('/^(?:[\w\-]+\.)?([a-z]{2}(?:[-_][A-Z]{2})?)\.(intl\.)?(yaml|json)$/i', $file, $matches)) {
+                $locale = $matches[1]; // es, es-ES, en, etc.
+                $isIntl = !empty($matches[2]);
+                $extension = $matches[3]; // yaml or json
+
+                $fullPath = "{$self->path}/$file";
+
+                $resourceType = $extension;
+
+                $translator->addResource($resourceType, $fullPath, $locale);
             }
         }
 

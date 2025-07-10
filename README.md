@@ -69,3 +69,57 @@ The middleware will try to set the current language looking for the following:
 * lang query parameter
 * Accepted-Language header
 * default language configured in `Language::load()`
+
+## ICU formatting
+For use pluralization and other ICU features, you must use the `intl` file format:
+
+```
+en.intl.yaml
+```
+**Remember:** The variables in the ICU format must be wrapped in curly braces:
+```yaml
+welcome: "Welcome, {name}!"
+```
+
+### How to pluralize
+A quickly example:
+```yaml
+hour: >-
+   {n, plural,
+       =1    {hour}
+       other {hours}
+   }
+```
+```php
+echo Language::i()->trans('hour', ['n' => 1]);
+// Output: "hour"
+echo Language::i()->trans('hour', ['n' => 2]);
+// Output: "hours"
+```
+You can also use the `n` variable in other ways, ie: getting the name of the day:
+```yaml
+day_name: >-
+   {n, plural,
+      =1    {Monday}
+      =2    {Tuesday}
+      =3    {Wednesday}
+      =4    {Thursday}
+      =5    {Friday}
+      =6    {Saturday}
+      =7    {Sunday}
+      other {unknown day}
+   }
+```
+
+## Variable management
+With the Language service you can avoid the wrapper characters in the params:
+```yaml
+welcome: "Welcome, {name}!"
+```
+```php
+echo Language::i()->trans('welcome', ['name' => 'Airam']);
+```
+```twig
+<p>{{ t('welcome', { name: 'Airam' }) }}</p>
+```
+
