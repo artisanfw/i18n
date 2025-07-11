@@ -57,6 +57,7 @@ class Language
         $translator->addLoader(self::JSON_FORMAT, new JsonFileLoader());
 
         foreach (scandir($self->path) as $file) {
+            if ($file == '.' || $file == '..') continue;
             $fullPath = "{$self->path}/$file";
             $domain = pathinfo($file, PATHINFO_FILENAME);
             var_dump($file); die;
