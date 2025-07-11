@@ -9,7 +9,7 @@ use Artisan\Routing\Interfaces\IMiddleware;
 
 class Locale implements IMiddleware
 {
-    public function before(array $routeParams, Request $request, IApiResponse $response): void
+    public function run(array $routeParams, Request $request, IApiResponse $response): void
     {
         $lang = $request->query->get('lang');
 
@@ -26,13 +26,10 @@ class Locale implements IMiddleware
         }
     }
 
-    public function after(array $routeParams, Request $request, IApiResponse $response): void { }
-
     private function parseLocale(string $header): ?string
     {
-        // Extrae el idioma principal del header Accept-Language (p.ej., "es-ES,es;q=0.9,en;q=0.8")
         if (preg_match('/^([a-z]{2})(-[A-Z]{2})?/', $header, $matches)) {
-            return strtolower($matches[1]);  // Devuelve el código de idioma en minúsculas, como "es"
+            return strtolower($matches[1]);
         }
         return null;
     }

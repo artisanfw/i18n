@@ -4,6 +4,7 @@ namespace Artisan\Services;
 
 use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Component\Translation\Loader\JsonFileLoader;
+use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Translator;
 use RuntimeException;
 
@@ -12,10 +13,15 @@ class Language
     public const string YAML_FORMAT = 'yaml';
     public const string JSON_FORMAT = 'json';
 
+    public const string WRAPPER_CURLY_BRACES = '{}';
+    public const string WRAPPER_PERCENT_SIGN = '%';
+
     private static ?self $instance = null;
     private Translator $translator;
     private string $locale;
     private string $path;
+    private string $defaultVarWrapper = self::WRAPPER_PERCENT_SIGN;
+    private string $defaultDomain;
 
     private function __construct() {}
     private function __clone() {}
@@ -26,26 +32,30 @@ class Language
             throw new RuntimeException('Language::load requires both "locale" and "path"');
         }
 
-        $format = $config['file_format'] ?? self::YAML_FORMAT;
-        if (!in_array($format, [self::YAML_FORMAT, self::JSON_FORMAT])) {
-            throw new RuntimeException('Unsupported file format: ' . $format);
+        $wrapper = $config['wrapper'] ?? self::WRAPPER_PERCENT_SIGN;
+        if (!in_array($wrapper, [self::WRAPPER_CURLY_BRACES, self::WRAPPER_PERCENT_SIGN])) {
+            throw new RuntimeException('Unsupported wrapper: ' . $wrapper);
         }
 
         $self = new self();
         $self->locale = $config['locale'];
         $self->path = rtrim($config['path'], '/');
+        $self->defaultVarWrapper = $wrapper;
+        $self->defaultDomain = $config['default_domain'] ?? 'messages';
 
-        $translator = new Translator($self->locale);
-
-        match ($format) {
-            self::YAML_FORMAT => $translator->addLoader(self::YAML_FORMAT, new YamlFileLoader()),
-            self::JSON_FORMAT => $translator->addLoader(self::JSON_FORMAT, new JsonFileLoader()),
-        };
+        $formatter = new MessageFormatter();
+        $translator = new Translator($self->locale, $formatter);
+        $translator->addLoader(self::YAML_FORMAT, new YamlFileLoader());
+        $translator->addLoader(self::JSON_FORMAT, new JsonFileLoader());
 
         foreach (scandir($self->path) as $file) {
-            if (preg_match('/^([a-z]{2}(?:[-_][A-Z]{2})?)\.([a-z]+)(?:\.yaml)?$/i', $file, $matches)) {
-                $lang = $matches[1];
-                $translator->addResource($format, "{$self->path}/$file", $lang);
+            if ($file == '.' || $file == '..') continue;
+            $fullPath = "{$self->path}/$file";
+            $domain = explode('.', pathinfo($file, PATHINFO_FILENAME))[0];
+            if (str_ends_with($file, '.'.self::YAML_FORMAT)) {
+                $translator->addResource(self::YAML_FORMAT, $fullPath, $self->locale, $domain);
+            } elseif (str_ends_with($file, '.'.self::JSON_FORMAT)) {
+                $translator->addResource(self::JSON_FORMAT, $fullPath, $self->locale, $domain);
             }
         }
 
@@ -68,8 +78,8 @@ class Language
             throw new RuntimeException('Twig is not installed. Cannot create twig translation function.');
         }
 
-        return new \Twig\TwigFunction('t', function (string $key, array $params = []) {
-            return self::i()->trans($key, $params);
+        return new \Twig\TwigFunction('t', function (string $key, array $params = [], ?string $domain = null, ?string $locale = null) {
+            return self::i()->trans(key: $key, params: $params, domain: $domain, locale: $locale);
         });
     }
 
@@ -84,9 +94,17 @@ class Language
             ) {
                 $processedParams[$paramKey] = $value;
             } else {
-                $processedParams['{' . $paramKey . '}'] = $value;
+                if ($this->defaultVarWrapper == self::WRAPPER_PERCENT_SIGN) {
+                    $sw = $ew = '%';
+                } else {
+                    $sw = '{';
+                    $ew = '}';
+                }
+                $processedParams[$sw . $paramKey . $ew] = $value;
             }
         }
+
+        $domain ??= $this->defaultDomain;
 
         return $this->translator->trans($key, $processedParams, $domain, $locale);
     }
