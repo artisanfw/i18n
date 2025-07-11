@@ -81,8 +81,8 @@ class Language
             throw new RuntimeException('Twig is not installed. Cannot create twig translation function.');
         }
 
-        return new \Twig\TwigFunction('t', function (string $key, array $params = []) {
-            return self::i()->trans($key, $params);
+        return new \Twig\TwigFunction('t', function (string $key, array $params = [], ?string $domain = null, ?string $locale = null) {
+            return self::i()->trans(key: $key, params: $params, domain: $domain, locale: $locale);
         });
     }
 
