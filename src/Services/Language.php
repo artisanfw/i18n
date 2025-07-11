@@ -36,9 +36,15 @@ class Language
             throw new RuntimeException('Unsupported file format: ' . $format);
         }
 
+        $wrapper = $config['wrapper'] ?? self::WRAPPER_PERCENT_SIGN;
+        if (!in_array($config['wrapper'], [self::WRAPPER_CURLY_BRACES, self::WRAPPER_PERCENT_SIGN])) {
+            throw new RuntimeException('Unsupported wrapper: ' . $wrapper);
+        }
+
         $self = new self();
         $self->locale = $config['locale'];
         $self->path = rtrim($config['path'], '/');
+        $self->defaultVarWrapper = $wrapper;
 
         $translator = new Translator($self->locale);
         $translator->addLoader(self::YAML_FORMAT, new YamlFileLoader());
