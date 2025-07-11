@@ -9,11 +9,14 @@ composer require artisanfw/i18n
 ## Configuration and Usage
 ### Load the Service
 ```php
-Language::load([
-    'locale' => 'en',                       // Default language
+$config = [
+    'locale' => 'en',                         // Default language
     'path' => PROJECT_DIR . '/locales',       // Path to translation files
     'file_format' => \Artisan\Services\Language::YAML_FORMAT,
-]);
+    'default_domain' => 'messages',           // Default domain
+];
+
+Language::load($config);
 ```
 Translation files must ends with the pattern: `en.yaml`, `es.yaml`, `en.json`, etc.
 
@@ -59,27 +62,56 @@ If you're using `artisanfw/twig`, simply include `Language::getTwigFunction()` i
 If you're using `artisanfw/api`, you can an add the middleware `Artisan\Middleware\Locale` to your Bootstrap settings.
 
 ```php
-$apiManager->addPreprocessor(new \Artisan\Middlewares\Locale());
+$apiManager->addMiddleware(new \Artisan\Middlewares\Locale());
 ```
 
 The middleware will try to set the current language looking for the following:
-* lang query parameter
-* Accepted-Language header
-* default language configured in `Language::load()`
+1. `lang` query parameter
+2. `Accepted-Language` header
+3. default language configured in `Language::load()`
+
+## Variable management
+You can avoid the wrapper characters in the params:
+```yaml
+welcome: "Welcome, {name}!"
+```
+```php
+echo Language::i()->trans('welcome', ['name' => 'Airam']);
+```
+```twig
+<p>{{ t('welcome', { name: 'Airam' }) }}</p>
+```
+You can define the default wrapper characters in the configuration:
+```php
+$conf = [
+    ...
+    'wrapper' => \Artisan\Services\Language::WRAPPER_CURLY_BRACES,
+    ...
+];
+```
+### Options
+* `WRAPPER_CURLY_BRACES` : ICU format
+* `WRAPPER_PERCENT_SIGN` : Legacy format
 
 ## ICU formatting
-For use pluralization and other ICU features, you must use the `intl` file format:
+For use pluralization and other ICU features, you must use the suffix `+intl-icu` in domain:
 
+
+```php
+$config = [
+    // ... previous configuration
+    
+    'default_domain' => 'messages+intl-icu'
+]
 ```
-en.intl.yaml
-```
-**Remember:** The variables in the ICU format must be wrapped in curly braces:
+
+**Remember:** The variables in the ICU format **must** be wrapped in curly braces:
 ```yaml
 welcome: "Welcome, {name}!"
 ```
 
 ### How to pluralize
-A quickly example:
+A quick example:
 ```yaml
 hour: >-
    {n, plural,
@@ -108,26 +140,9 @@ day_name: >-
    }
 ```
 
-## Variable management
-With the Language service you can avoid the wrapper characters in the params:
-```yaml
-welcome: "Welcome, {name}!"
-```
-```php
-echo Language::i()->trans('welcome', ['name' => 'Airam']);
-```
-```twig
-<p>{{ t('welcome', { name: 'Airam' }) }}</p>
-```
-You can define the default wrapper characters in the configuration:
-```php
-$conf = [
-    ...
-    'wrapper' => \Artisan\Services\Language::WRAPPER_CURLY_BRACES,
-    ...
-];
-```
-### Options
-* `WRAPPER_CURLY_BRACES` : ICU format
-* `WRAPPER_PERCENT_SIGN` : Legacy format
+Please, for more information about ICU formatting, see:
+* [ICU Documentation]( https://unicode-org.github.io/icu/ )
+* [Symfony Translate package](https://symfony.com/doc/current/reference/formats/message_format.html)*
+
+*The Symfony documentation is primarily tailored to the Symfony Framework, so certain concepts will need to be abstracted in order to apply them effectively within the Artisan Framework. Nevertheless, it is likely to be more accessible than the ICU documentation.
 
