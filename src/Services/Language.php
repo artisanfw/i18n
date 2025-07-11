@@ -55,7 +55,6 @@ class Language
         }
 
         $self->translator = $translator;
-        $self->translator->setLocale($self->locale);
         self::$instance = $self;
     }
 
