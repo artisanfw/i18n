@@ -43,13 +43,11 @@ class Language
             throw new RuntimeException('Unsupported wrapper: ' . $wrapper);
         }
 
-        $domain = $config['default_domain'] ?? 'messages';
-
         $self = new self();
         $self->locale = $config['locale'];
         $self->path = rtrim($config['path'], '/');
         $self->defaultVarWrapper = $wrapper;
-        $self->defaultDomain = $domain;
+        $self->defaultDomain = $config['default_domain'] ?? 'messages';
 
         $formatter = new MessageFormatter();
         $translator = new Translator($self->locale, $formatter);
@@ -60,7 +58,7 @@ class Language
             if ($file == '.' || $file == '..') continue;
             $fullPath = "{$self->path}/$file";
             $domain = pathinfo($file, PATHINFO_FILENAME);
-            var_dump($domain); die;
+
             if (str_ends_with($file, '.'.self::YAML_FORMAT)) {
                 $translator->addResource(self::YAML_FORMAT, $fullPath, $self->locale, $domain);
             } elseif (str_ends_with($file, '.'.self::JSON_FORMAT)) {
