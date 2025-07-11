@@ -32,12 +32,6 @@ class Language
             throw new RuntimeException('Language::load requires both "locale" and "path"');
         }
 
-        $format = $config['file_format'] ?? self::YAML_FORMAT;
-
-        if (!in_array($format, [self::YAML_FORMAT, self::JSON_FORMAT])) {
-            throw new RuntimeException('Unsupported file format: ' . $format);
-        }
-
         $wrapper = $config['wrapper'] ?? self::WRAPPER_PERCENT_SIGN;
         if (!in_array($wrapper, [self::WRAPPER_CURLY_BRACES, self::WRAPPER_PERCENT_SIGN])) {
             throw new RuntimeException('Unsupported wrapper: ' . $wrapper);
