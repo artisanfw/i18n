@@ -21,6 +21,7 @@ class Language
     private string $locale;
     private string $path;
     private string $defaultVarWrapper = self::WRAPPER_PERCENT_SIGN;
+    private string $defaultDomain;
 
     private function __construct() {}
     private function __clone() {}
@@ -42,10 +43,14 @@ class Language
             throw new RuntimeException('Unsupported wrapper: ' . $wrapper);
         }
 
+        $domain = $config['default_domain'] ?? 'messages';
+
+
         $self = new self();
         $self->locale = $config['locale'];
         $self->path = rtrim($config['path'], '/');
         $self->defaultVarWrapper = $wrapper;
+        $self->defaultDomain = $domain;
 
         $formatter = new MessageFormatter();
         $translator = new Translator($self->locale, $formatter);
@@ -107,7 +112,7 @@ class Language
             }
         }
 
-        $domain ??= 'messages';
+        $domain ??= $this->defaultDomain;
 
         return $this->translator->trans($key, $processedParams, $domain, $locale);
     }
