@@ -57,7 +57,7 @@ class Language
         foreach (scandir($self->path) as $file) {
             if ($file == '.' || $file == '..') continue;
             $fullPath = "{$self->path}/$file";
-            $domain = pathinfo($file, PATHINFO_FILENAME);
+            $domain = explode('.', pathinfo($file, PATHINFO_FILENAME))[0];
             var_dump($domain); die;
             if (str_ends_with($file, '.'.self::YAML_FORMAT)) {
                 $translator->addResource(self::YAML_FORMAT, $fullPath, $self->locale, $domain);
