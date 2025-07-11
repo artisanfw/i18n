@@ -103,7 +103,7 @@ class Language
                     $sw = '{';
                     $ew = '}';
                 }
-                $processedParams[$paramKey] = $value;
+                $processedParams[$sw . $paramKey . $ew] = $value;
             }
         }
 
