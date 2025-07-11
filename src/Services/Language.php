@@ -38,7 +38,7 @@ class Language
         }
 
         $wrapper = $config['wrapper'] ?? self::WRAPPER_PERCENT_SIGN;
-        if (!in_array($config['wrapper'], [self::WRAPPER_CURLY_BRACES, self::WRAPPER_PERCENT_SIGN])) {
+        if (!in_array($wrapper, [self::WRAPPER_CURLY_BRACES, self::WRAPPER_PERCENT_SIGN])) {
             throw new RuntimeException('Unsupported wrapper: ' . $wrapper);
         }
 
@@ -54,11 +54,11 @@ class Language
 
         foreach (scandir($self->path) as $file) {
             $fullPath = "{$self->path}/$file";
-
+            $domain = pathinfo($file, PATHINFO_FILENAME);
             if (str_ends_with($file, '.'.self::YAML_FORMAT)) {
-                $translator->addResource(self::YAML_FORMAT, $fullPath, $self->locale);
+                $translator->addResource(self::YAML_FORMAT, $fullPath, $self->locale, $domain);
             } elseif (str_ends_with($file, '.'.self::JSON_FORMAT)) {
-                $translator->addResource(self::JSON_FORMAT, $fullPath, $self->locale);
+                $translator->addResource(self::JSON_FORMAT, $fullPath, $self->locale, $domain);
             }
         }
 
@@ -106,6 +106,8 @@ class Language
                 $processedParams[$sw . $paramKey . $ew] = $value;
             }
         }
+
+        $domain ??= 'messages+intl-icu';
 
         return $this->translator->trans($key, $processedParams, $domain, $locale);
     }
