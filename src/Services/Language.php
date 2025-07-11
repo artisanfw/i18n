@@ -45,7 +45,6 @@ class Language
 
         $domain = $config['default_domain'] ?? 'messages';
 
-
         $self = new self();
         $self->locale = $config['locale'];
         $self->path = rtrim($config['path'], '/');
@@ -59,7 +58,6 @@ class Language
 
         foreach (scandir($self->path) as $file) {
             $fullPath = "{$self->path}/$file";
-            $domain = pathinfo($file, PATHINFO_FILENAME);
             if (str_ends_with($file, '.'.self::YAML_FORMAT)) {
                 $translator->addResource(self::YAML_FORMAT, $fullPath, $self->locale, $domain);
             } elseif (str_ends_with($file, '.'.self::JSON_FORMAT)) {
