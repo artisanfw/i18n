@@ -58,7 +58,6 @@ class Language
             if ($file == '.' || $file == '..') continue;
             $fullPath = "{$self->path}/$file";
             $domain = explode('.', pathinfo($file, PATHINFO_FILENAME))[0];
-            var_dump($domain); die;
             if (str_ends_with($file, '.'.self::YAML_FORMAT)) {
                 $translator->addResource(self::YAML_FORMAT, $fullPath, $self->locale, $domain);
             } elseif (str_ends_with($file, '.'.self::JSON_FORMAT)) {
