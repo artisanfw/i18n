@@ -103,11 +103,11 @@ class Language
                     $sw = '{';
                     $ew = '}';
                 }
-                $processedParams[$sw . $paramKey . $ew] = $value;
+                $processedParams[$paramKey] = $value;
             }
         }
 
-        $domain ??= 'messages+intl-icu';
+        $domain ??= 'messages';
 
         return $this->translator->trans($key, $processedParams, $domain, $locale);
     }
