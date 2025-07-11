@@ -12,10 +12,14 @@ class Language
     public const string YAML_FORMAT = 'yaml';
     public const string JSON_FORMAT = 'json';
 
+    public const string WRAPPER_CURLY_BRACES = '{}';
+    public const string WRAPPER_PERCENT_SIGN = '%';
+
     private static ?self $instance = null;
     private Translator $translator;
     private string $locale;
     private string $path;
+    private string $defaultVarWrapper = self::WRAPPER_PERCENT_SIGN;
 
     private function __construct() {}
     private function __clone() {}
@@ -85,7 +89,13 @@ class Language
             ) {
                 $processedParams[$paramKey] = $value;
             } else {
-                $processedParams['{' . $paramKey . '}'] = $value;
+                if ($this->defaultVarWrapper == self::WRAPPER_PERCENT_SIGN) {
+                    $sw = $ew = '%';
+                } else {
+                    $sw = '{';
+                    $ew = '}';
+                }
+                $processedParams[$sw . $paramKey . $ew] = $value;
             }
         }
 

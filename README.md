@@ -15,10 +15,7 @@ Language::load([
     'file_format' => \Artisan\Services\Language::YAML_FORMAT,
 ]);
 ```
-Translation files must follow the pattern: `en.yaml`, `es.yaml`, etc.
-
-**Recommended:** ICU file pattern `en.intl.yaml`, etc. "intl" enables ICU message formatting with pluralization. But it uses `{single mustache}` instead `%percent%` variables
-
+Translation files must ends with the pattern: `en.yaml`, `es.yaml`, `en.json`, etc.
 
 Supported formats:
 * `Language::YAML_FORMAT`
@@ -41,7 +38,7 @@ echo Language::i()->trans('welcome', ['%name%' => 'Airam']);
 ```
 ### Override the Locale
 ```php
-echo Language::i()->trans('welcome', ['%name%' => 'Airam'], null, 'es');
+echo Language::i()->trans('welcome', ['%name%' => 'Airam'], 'es');
 // Output: "¡Bienvenido, Airam!"
 ```
 ## Optional: Allow translation in Twig templates
@@ -122,4 +119,15 @@ echo Language::i()->trans('welcome', ['name' => 'Airam']);
 ```twig
 <p>{{ t('welcome', { name: 'Airam' }) }}</p>
 ```
+You can define the default wrapper characters in the configuration:
+```php
+$conf = [
+    ...
+    'wrapper' => \Artisan\Services\Language::WRAPPER_CURLY_BRACES,
+    ...
+];
+```
+### Options
+* `WRAPPER_CURLY_BRACES` : ICU format
+* `WRAPPER_PERCENT_SIGN` : Legacy format
 
