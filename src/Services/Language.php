@@ -41,17 +41,12 @@ class Language
         $translator->addLoader(self::JSON_FORMAT, new JsonFileLoader());
 
         foreach (scandir($self->path) as $file) {
-            // Support: es.yaml, es.intl.yaml, messages.es.yaml, messages.es.intl.yaml
-            if (preg_match('/^(?:[\w\-]+\.)?([a-z]{2}(?:[-_][A-Z]{2})?)\.(intl\.)?(yaml|json)$/i', $file, $matches)) {
-                $locale = $matches[1]; // es, es-ES, en, etc.
-                $isIntl = !empty($matches[2]);
-                $extension = $matches[3]; // yaml or json
+            $fullPath = "{$self->path}/$file";
 
-                $fullPath = "{$self->path}/$file";
-
-                $resourceType = $extension;
-
-                $translator->addResource($resourceType, $fullPath, $locale);
+            if (str_ends_with($file, '.'.self::YAML_FORMAT)) {
+                $translator->addResource(self::YAML_FORMAT, $fullPath, $self->locale);
+            } elseif (str_ends_with($file, '.'.self::JSON_FORMAT)) {
+                $translator->addResource(self::JSON_FORMAT, $fullPath, $self->locale);
             }
         }
 
