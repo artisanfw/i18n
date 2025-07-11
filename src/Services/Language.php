@@ -4,6 +4,7 @@ namespace Artisan\Services;
 
 use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Component\Translation\Loader\JsonFileLoader;
+use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Translator;
 use RuntimeException;
 
@@ -46,7 +47,8 @@ class Language
         $self->path = rtrim($config['path'], '/');
         $self->defaultVarWrapper = $wrapper;
 
-        $translator = new Translator($self->locale);
+        $formatter = new MessageFormatter();
+        $translator = new Translator($self->locale, $formatter);
         $translator->addLoader(self::YAML_FORMAT, new YamlFileLoader());
         $translator->addLoader(self::JSON_FORMAT, new JsonFileLoader());
 
